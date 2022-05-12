@@ -39,3 +39,6 @@ Route.resource('skck', 'SkckController').apiOnly();
 Route.resource('domisili', 'DomisiliController').apiOnly();
 Route.resource('surat-keterangan', 'SuratKeteranganController').apiOnly();
 Route.resource('kehilangan-kk', 'KehilanganKkController').apiOnly();
+
+Route.get('/testApi', 'TestsController.testGet')
+Route.post('/testPost', 'TestsController.testPost')
