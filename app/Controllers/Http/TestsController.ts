@@ -8,6 +8,7 @@ export default class TestsController {
     }
 
     public async testPost({ request, response }: HttpContextContract) {
-        return response.status(200).json(request.all())
+        // return response.status(200).json(request.all())
+        return response.status(200).json(request.file('kk'))
     }
 }
