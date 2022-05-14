@@ -17,8 +17,10 @@ export default class Pemohon extends BaseModel {
   @column()
   public tempat_lahir: string
 
-  @column()
-  public tanggal_lahir: string
+  @column.date({
+    serialize: (value) => value.toFormat('dd LLL yyyy')
+  })
+  public tanggal_lahir: DateTime
 
   @column()
   public jenis_kelamin: string
@@ -44,10 +46,10 @@ export default class Pemohon extends BaseModel {
   @column()
   public kk: string
 
-  @column.dateTime({ autoCreate: true })
+  @column.date({ autoCreate: true })
   public createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.date({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
   @hasMany(() => Sktm)
