@@ -21,31 +21,33 @@ export default class PemohonsController {
     }
 
     public async store({ request, response }: HttpContextContract) {
-
-        const kk = request.file('kk', {
-            size: '2mb'
-        })
-
-        const name = kk?.clientName
-        const ext = name?.split('.')[1]
-        const ts = new Date().valueOf()
-        const fileName = ts + '.' + ext
-
+        
         const userSchema = schema.create({
-            nik: schema.number([rules.unique({table: 'pemohons', column: 'nik'})]),
+            nik: schema.string({},[rules.unique({table: 'pemohons', column: 'nik'})]),
             tempat_lahir: schema.string(),
             tanggal_lahir: schema.date(),
             jenis_kelamin: schema.string(),
             kewarganegaraan: schema.string(),
             agama: schema.string(),
             pekerjaan: schema.string(),
-            telpon: schema.number(),
+            telpon: schema.string(),
             nama: schema.string(),
             alamat: schema.string(),
             kk: schema.file({size: '2mb'})
         })
 
-        const dataValidated = await request.validate({schema: userSchema})
+        const dataValidated = await request.validate({schema: userSchema, messages:{
+            'nik.unique' : 'NIK sudah terdaftar',
+            'kk.file.size' : 'File KK lebih dari 2Mb',
+        }})
+
+        const kk = request.file('kk')
+
+        const name = kk?.clientName
+        const ext = name?.split('.')[1]
+        const ts = new Date().valueOf()
+        const fileName = ts + '.' + ext
+
 
         const data = {
             'nik' : dataValidated.nik,
@@ -82,8 +84,8 @@ export default class PemohonsController {
     }
 
     public async show({ params }: HttpContextContract) {
-
-        const data = await Pemohon.find(params.id)
+        console.log(params)
+        const data = await Pemohon.findBy('nik', params.nik)
         const fileUrl = await Drive.getUrl(''+data?.kk)
         const url = Env.get('APP_URL') + fileUrl
 
@@ -107,6 +109,40 @@ export default class PemohonsController {
             
         }
         return pemohon
+    }
+
+    public async update({params, request, response}:HttpContextContract){
+
+        const pemohon = await Pemohon.findByOrFail('nik', params.nik)
+        const userSchema = schema.create({
+            nama: schema.string(),
+            jenis_kelamin: schema.string(),
+            tempat_lahir: schema.string(),
+            tanggal_lahir: schema.date(),
+            agama: schema.string(),
+            kewarganegaraan: schema.string(),
+            alamat: schema.string(),
+            telpon: schema.string(),
+            pekerjaan: schema.string(),
+        })
+
+        const data = await request.validate({schema: userSchema, })
+        try {
+            pemohon.nama = data.nama
+            pemohon.jenis_kelamin = data.jenis_kelamin
+            pemohon.tempat_lahir = data.tempat_lahir
+            pemohon.tanggal_lahir = data.tanggal_lahir
+            pemohon.agama = data.agama
+            pemohon.kewarganegaraan = data.kewarganegaraan
+            pemohon.alamat = data.alamat
+            pemohon.telpon = data.telpon
+            pemohon.pekerjaan = data.pekerjaan
+            
+            await pemohon.save()
+            return response.status(200)
+        } catch (error) {
+            return response.badRequest(error)
+        }
     }
 }
 

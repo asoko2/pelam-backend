@@ -32,7 +32,10 @@ Route.get('/check', async () => {
   return 'berhasil'
 }).middleware(['auth', 'checkRole'])
 
-Route.resource('pemohon', 'PemohonsController').apiOnly();
+Route.resource('pemohon', 'PemohonsController').except(['update', 'show', 'destroy']).apiOnly();
+Route.get('/pemohon/:nik', 'PemohonsController.show')
+Route.put('/pemohon/:nik', 'PemohonsController.update')
+Route.delete('/pemohon/:nik', 'PemohonsController.destroy')
 Route.resource('sktm', 'SktmController').apiOnly();
 Route.resource('sku', 'SkuController').apiOnly();
 Route.resource('skck', 'SkckController').apiOnly();
