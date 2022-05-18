@@ -1,13 +1,19 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
-export default class Skcks extends BaseSchema {
-  protected tableName = 'skcks'
+export default class Keterangans extends BaseSchema {
+  protected tableName = 'keterangans'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id').primary()
-      table.integer('pemohon_id').unsigned().references('pemohons.id').onDelete('CASCADE')
-      table.string('keperluan')
+      table.increments('id')
+      table.string('jenis_permohonan')
+      table.string('keterangan')
+      table
+        .integer('permohonan_id')
+        .unsigned()
+        .references('skcks.id')
+        .references('sktms.id')
+        .references('domisilis.id')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

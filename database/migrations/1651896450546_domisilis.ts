@@ -7,7 +7,6 @@ export default class Domisilis extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
       table.integer('pemohon_id').unsigned().references('pemohons.id').onDelete('CASCADE')
-      table.string('keterangan')
       table.string('keperluan')
 
       /**

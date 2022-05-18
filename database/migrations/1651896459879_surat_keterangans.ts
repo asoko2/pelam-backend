@@ -6,7 +6,7 @@ export default class SuratKeterangans extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
-      table.integer('pemohon_id').unique().references('pemohons.id').onDelete('CASCADE')
+      table.integer('pemohon_id').unsigned().references('pemohons.id').onDelete('CASCADE')
       table.string('keterangan')
 
       /**
