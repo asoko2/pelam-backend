@@ -1,12 +1,13 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import Pemohon from 'App/Models/Pemohon'
 
 export default class Sktm extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
   @column()
-  public pemohonId: number
+  public pemohonNik: string
 
   @column()
   public keterangan: string
@@ -14,9 +15,17 @@ export default class Sktm extends BaseModel {
   @column()
   public keperluan: string
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({
+    autoCreate: true,
+    serialize: (value: DateTime | null) => {
+      return value ? value.toFormat('yyyy-LL-dd') : value
+    },
+  })
   public createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  // @belongsTo(() => Pemohon)
+  // public pemohonId: BelongsTo<typeof Pemohon>
 }

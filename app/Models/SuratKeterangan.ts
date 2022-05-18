@@ -1,17 +1,22 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 
-export default class SuratKetarangan extends BaseModel {
+export default class SuratKeterangan extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
   @column()
-  public pemohonId: number
+  public pemohonNik: string
 
   @column()
   public keterangan: string
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({
+    autoCreate: true,
+    serialize: (value: DateTime | null) => {
+      return value ? value.toFormat('yyyy-LL-dd') : value
+    },
+  })
   public createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })

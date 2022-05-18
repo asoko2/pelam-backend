@@ -19,6 +19,9 @@ export default class User extends BaseModel {
   public level: number
 
   @column()
+  public nama: string
+
+  @column()
   public keterangan: string
 
   @column.dateTime({ autoCreate: true })

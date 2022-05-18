@@ -5,7 +5,7 @@ import Sku from './Sku'
 import Skck from './Skck'
 import Domisili from './Domisili'
 import KehilanganKk from './KehilanganKk'
-import SuratKetarangan from './SuratKetarangan'
+import SuratKeterangan from './SuratKeterangan'
 
 export default class Pemohon extends BaseModel {
   @column({ isPrimary: true })
@@ -17,8 +17,10 @@ export default class Pemohon extends BaseModel {
   @column()
   public tempat_lahir: string
 
-  @column.date({
-    serialize: (value) => value.toFormat('dd LLL yyyy')
+  @column.dateTime({
+    serialize: (value: DateTime | null) => {
+      return value ? value.toFormat('yyyy-LL-dd') : value
+    },
   })
   public tanggal_lahir: DateTime
 
@@ -46,10 +48,15 @@ export default class Pemohon extends BaseModel {
   @column()
   public kk: string
 
-  @column.date({ autoCreate: true })
+  @column.dateTime({
+    autoCreate: true,
+    serialize: (value: DateTime | null) => {
+      return value ? value.toFormat('yyyy-LL-dd') : value
+    },
+  })
   public createdAt: DateTime
 
-  @column.date({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
   @hasMany(() => Sktm)
@@ -67,6 +74,6 @@ export default class Pemohon extends BaseModel {
   @hasMany(() => KehilanganKk)
   public kehilangan_kk: HasMany<typeof KehilanganKk>
 
-  @hasMany(() => SuratKetarangan)
-  public surat_keterangan: HasMany<typeof SuratKetarangan>
+  @hasMany(() => SuratKeterangan)
+  public surat_keterangan: HasMany<typeof SuratKeterangan>
 }
