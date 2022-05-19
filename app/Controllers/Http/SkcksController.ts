@@ -75,7 +75,6 @@ export default class SkcksController {
       .where('skcks.id', params.id)
 
     const keterangan = await Keterangan.query().where('permohonanId', data[0].id)
-    console.log(keterangan)
     const fileUrl = await Drive.getUrl('' + data[0].kk)
     const url = Env.get('APP_URL') + fileUrl
     const skck = {
@@ -87,8 +86,12 @@ export default class SkcksController {
   }
 
   public async destroy({ params, response }: HttpContextContract) {
+    console.log('start delete')
     const skck = await Skck.findByOrFail('id', params.id)
     try {
+      console.log('try delete')
+      const keterangan = await Keterangan.query().where('permohonanId', skck.id).delete()
+      console.log(keterangan)
       await skck.delete()
       return response.status(200)
     } catch (error) {
