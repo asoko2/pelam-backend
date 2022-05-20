@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 
 export default class Keterangan extends BaseModel {
   @column({ isPrimary: true })
@@ -14,6 +14,8 @@ export default class Keterangan extends BaseModel {
   @column()
   public permohonanId: number
 
+  @column()
+  public status: string
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

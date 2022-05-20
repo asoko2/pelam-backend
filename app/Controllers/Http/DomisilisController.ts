@@ -1,9 +1,11 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Domisili from 'App/Models/Domisili'
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import { schema } from '@ioc:Adonis/Core/Validator'
 import Drive from '@ioc:Adonis/Core/Drive'
 import Env from '@ioc:Adonis/Core/Env'
 import Database from '@ioc:Adonis/Lucid/Database'
+import Keterangan from 'App/Models/Keterangan'
+import { DateTime } from 'luxon'
 
 export default class DomisilisController {
   public async index({ request }: HttpContextContract) {
@@ -31,7 +33,6 @@ export default class DomisilisController {
   public async store({ request, response }: HttpContextContract) {
     const domisiliSchema = schema.create({
       pemohonNik: schema.string(),
-      keterangan: schema.string(),
       keperluan: schema.string(),
     })
 
@@ -40,7 +41,14 @@ export default class DomisilisController {
       messages: {},
     })
     try {
-      await Domisili.create(data)
+      const domisili = await Domisili.create(data)
+      request.input('keterangan').forEach(async (element) => {
+        await Keterangan.create({
+          keterangan: element,
+          jenis_permohonan: 'domisili',
+          permohonanId: domisili.id,
+        })
+      })
       return response.created()
     } catch (error) {
       return response.badRequest(error)
@@ -50,12 +58,32 @@ export default class DomisilisController {
   public async show({ params }: HttpContextContract) {
     const data = await Database.from('domisilis')
       .join('pemohons', 'domisilis.pemohon_nik', 'pemohons.nik')
-      .select('domisilis.*', 'pemohons.*')
+      .select(
+        'domisilis.*',
+        'pemohons.nik',
+        'pemohons.nama',
+        'pemohons.jenis_kelamin',
+        'pemohons.tanggal_lahir',
+        'pemohons.tempat_lahir',
+        'pemohons.agama',
+        'pemohons.kewarganegaraan',
+        'pemohons.alamat',
+        'keperluan',
+        'kk'
+      )
       .where('domisilis.id', params.id)
+
+    const keterangan = await Keterangan.query()
+      .where('permohonanId', data[0].id)
+      .andWhere('jenis_permohonan', 'domisili')
     const fileUrl = await Drive.getUrl('' + data[0].kk)
     const url = Env.get('APP_URL') + fileUrl
+    const tanggal_lahir = DateTime.fromJSDate(data[0].tanggal_lahir).toFormat('yyyy-LL-dd')
+
     const domisili = {
       domisili: data,
+      tanggal_lahir: tanggal_lahir,
+      keterangan: keterangan,
       kk_link: url,
     }
     return domisili
@@ -64,6 +92,7 @@ export default class DomisilisController {
   public async destroy({ params, response }: HttpContextContract) {
     const domisili = await Domisili.findByOrFail('id', params.id)
     try {
+      await Keterangan.query().where('permohonanId', domisili.id).delete()
       await domisili.delete()
       return response.status(200)
     } catch (error) {

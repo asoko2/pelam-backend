@@ -11,6 +11,9 @@ export default class SuratKeterangan extends BaseModel {
   @column()
   public keterangan: string
 
+  @column()
+  public status: string
+
   @column.dateTime({
     autoCreate: true,
     serialize: (value: DateTime | null) => {

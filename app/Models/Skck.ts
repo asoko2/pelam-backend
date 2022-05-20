@@ -9,7 +9,7 @@ export default class Skck extends BaseModel {
   public pemohonNik: string
 
   @column()
-  public keterangan: string
+  public string: string
 
   @column()
   public keperluan: string

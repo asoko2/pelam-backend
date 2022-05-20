@@ -17,6 +17,9 @@ export default class Sku extends BaseModel {
   @column()
   public alamatUsaha: string
 
+  @column()
+  public status: string
+
   @column.dateTime({
     autoCreate: true,
     serialize: (value: DateTime | null) => {

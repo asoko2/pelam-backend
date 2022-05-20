@@ -46,12 +46,9 @@ export default class SkusController {
       },
     })
     try {
-      console.log('try save sku')
       await Sku.create(data)
       return response.created()
     } catch (error) {
-      console.log('error')
-      console.log(error)
       return response.badRequest(error)
     }
   }

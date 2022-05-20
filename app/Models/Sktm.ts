@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
-import Pemohon from 'App/Models/Pemohon'
+import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 
 export default class Sktm extends BaseModel {
   @column({ isPrimary: true })
@@ -10,10 +9,10 @@ export default class Sktm extends BaseModel {
   public pemohonNik: string
 
   @column()
-  public keterangan: string
+  public keperluan: string
 
   @column()
-  public keperluan: string
+  public status: string
 
   @column.dateTime({
     autoCreate: true,

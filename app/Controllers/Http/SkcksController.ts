@@ -1,17 +1,17 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Skck from 'App/Models/Skck'
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import { schema } from '@ioc:Adonis/Core/Validator'
 import Drive from '@ioc:Adonis/Core/Drive'
 import Env from '@ioc:Adonis/Core/Env'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Keterangan from 'App/Models/Keterangan'
+import { DateTime } from 'luxon'
 
 export default class SkcksController {
   public async index({ request }: HttpContextContract) {
     const perPage = request.input('limit', 5)
     const pageInput = request.input('page', 0)
     const search = request.input('search')
-    // const offset = params.offset
     const skcks = search
       ? await Database.from('skcks')
           .join('pemohons', 'skcks.pemohon_nik', 'pemohons.nik')
@@ -32,7 +32,6 @@ export default class SkcksController {
   public async store({ request, response }: HttpContextContract) {
     const skckSchema = schema.create({
       pemohonNik: schema.string(),
-      // keterangan: schema.string(),
       keperluan: schema.string(),
     })
 
@@ -42,7 +41,6 @@ export default class SkcksController {
     })
     try {
       const skck = await Skck.create(data)
-      console.log(skck)
       request.input('keterangan').forEach(async (element) => {
         await Keterangan.create({
           keterangan: element,
@@ -66,6 +64,7 @@ export default class SkcksController {
         'pemohons.nama',
         'pemohons.jenis_kelamin',
         'pemohons.tanggal_lahir',
+        'pemohons.tempat_lahir',
         'pemohons.agama',
         'pemohons.kewarganegaraan',
         'pemohons.alamat',
@@ -74,11 +73,15 @@ export default class SkcksController {
       )
       .where('skcks.id', params.id)
 
-    const keterangan = await Keterangan.query().where('permohonanId', data[0].id)
+    const keterangan = await Keterangan.query()
+      .where('permohonanId', data[0].id)
+      .andWhere('jenis_permohonan', 'skck')
     const fileUrl = await Drive.getUrl('' + data[0].kk)
     const url = Env.get('APP_URL') + fileUrl
+    const tanggal_lahir = DateTime.fromJSDate(data[0].tanggal_lahir).toFormat('yyyy-LL-dd')
     const skck = {
       skck: data,
+      tanggal_lahir: tanggal_lahir,
       keterangan: keterangan,
       kk_link: url,
     }
@@ -86,12 +89,9 @@ export default class SkcksController {
   }
 
   public async destroy({ params, response }: HttpContextContract) {
-    console.log('start delete')
     const skck = await Skck.findByOrFail('id', params.id)
     try {
-      console.log('try delete')
-      const keterangan = await Keterangan.query().where('permohonanId', skck.id).delete()
-      console.log(keterangan)
+      await Keterangan.query().where('permohonanId', skck.id).delete()
       await skck.delete()
       return response.status(200)
     } catch (error) {

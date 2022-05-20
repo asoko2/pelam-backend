@@ -14,6 +14,9 @@ export default class KehilanganKk extends BaseModel {
   @column()
   public ktp: string
 
+  @column()
+  public status: string
+
   @column.dateTime({
     autoCreate: true,
     serialize: (value: DateTime | null) => {

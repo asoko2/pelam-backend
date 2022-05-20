@@ -9,10 +9,10 @@ export default class Domisili extends BaseModel {
   public pemohonNik: string
 
   @column()
-  public keterangan: string
+  public keperluan: string
 
   @column()
-  public keperluan: string
+  public status: string
 
   @column.dateTime({
     autoCreate: true,
