@@ -65,6 +65,7 @@ export default class SkcksController {
         'pemohons.jenis_kelamin',
         'pemohons.tanggal_lahir',
         'pemohons.tempat_lahir',
+        'pemohons.pekerjaan',
         'pemohons.agama',
         'pemohons.kewarganegaraan',
         'pemohons.alamat',
@@ -96,6 +97,17 @@ export default class SkcksController {
       return response.status(200)
     } catch (error) {
       return response.badRequest(error)
+    }
+  }
+
+  public async updateStatus({ params, request, response }: HttpContextContract) {
+    const skck = await Skck.find(params.id)
+    try {
+      skck.status = request.input('status')
+      await skck?.save()
+      return response.status(200)
+    } catch (err) {
+      return response.badRequest(err)
     }
   }
 }

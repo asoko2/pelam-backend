@@ -69,4 +69,15 @@ export default class SuratKeterangansController {
       return response.badRequest(error)
     }
   }
+
+  public async updateStatus({ params, request, response }: HttpContextContract) {
+    const surat_ketarangan = await SuratKeterangan.find(params.id)
+    try {
+      surat_ketarangan.status = request.input('status')
+      await surat_ketarangan?.save()
+      return response.status(200)
+    } catch (err) {
+      return response.badRequest(err)
+    }
+  }
 }

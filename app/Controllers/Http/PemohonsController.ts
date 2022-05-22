@@ -5,7 +5,7 @@ import Drive from '@ioc:Adonis/Core/Drive'
 import Env from '@ioc:Adonis/Core/Env'
 import Pemohon from 'App/Models/Pemohon'
 import Application from '@ioc:Adonis/Core/Application'
-import { DateTime } from 'luxon'
+import User from 'App/Models/User'
 
 export default class PemohonsController {
   public async index({ request }: HttpContextContract) {
@@ -31,7 +31,7 @@ export default class PemohonsController {
   }
 
   public async store({ request, response }: HttpContextContract) {
-    const userSchema = schema.create({
+    const pemohonSchema = schema.create({
       nik: schema.string({}, [rules.unique({ table: 'pemohons', column: 'nik' })]),
       tempat_lahir: schema.string(),
       tanggal_lahir: schema.date(),
@@ -45,8 +45,19 @@ export default class PemohonsController {
       kk: schema.file({ size: '2mb' }),
     })
 
-    const dataValidated = await request.validate({
+    const userSchema = schema.create({
+      username: schema.string({}, [rules.unique({ table: 'users', column: 'username' })]),
+    })
+
+    const userValidated = await request.validate({
       schema: userSchema,
+      messages: {
+        'username.unique': 'Username sudah terdaftar',
+      },
+    })
+
+    const dataValidated = await request.validate({
+      schema: pemohonSchema,
       messages: {
         'nik.unique': 'NIK sudah terdaftar',
       },
@@ -73,6 +84,13 @@ export default class PemohonsController {
       kk: fileName,
     }
 
+    const userData = {
+      username: userValidated.username,
+      password: 'pemohon',
+      level: 4,
+      nama: dataValidated.nama,
+    }
+
     fs.mkdirSync(Application.publicPath('/uploads'), { recursive: true })
     await kk?.moveToDisk(Application.publicPath('/uploads'), { name: fileName })
     if (kk?.state == 'moved') {
@@ -82,6 +100,7 @@ export default class PemohonsController {
     }
     try {
       await Pemohon.create(data)
+      await User.create(userData)
       return response.created()
     } catch (error) {
       return response.badRequest(error)
@@ -92,11 +111,6 @@ export default class PemohonsController {
     const data = await Pemohon.findBy('nik', params.nik)
     const fileUrl = await Drive.getUrl('' + data?.kk)
     const url = Env.get('APP_URL') + fileUrl
-
-    // const date = new Date(data!.tanggal_lahir.toString())
-
-    // const tanggal = DateTime.fromJSDate(date).toFormat('yyyy-LL-dd')
-
     const pemohon = {
       pemohon: data,
       kk_link: url,
@@ -140,6 +154,7 @@ export default class PemohonsController {
   public async destroy({ params, response }: HttpContextContract) {
     const pemohon = await Pemohon.findByOrFail('nik', params.nik)
     try {
+      await Drive.delete(pemohon.kk)
       await pemohon.delete()
       return response.status(200)
     } catch (error) {

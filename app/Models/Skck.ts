@@ -13,6 +13,8 @@ export default class Skck extends BaseModel {
 
   @column()
   public keperluan: string
+  @column()
+  public status: string
 
   @column.dateTime({
     autoCreate: true,

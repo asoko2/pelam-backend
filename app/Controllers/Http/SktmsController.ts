@@ -65,6 +65,7 @@ export default class SktmsController {
         'pemohons.jenis_kelamin',
         'pemohons.tanggal_lahir',
         'pemohons.tempat_lahir',
+        'pemohons.pekerjaan',
         'pemohons.agama',
         'pemohons.kewarganegaraan',
         'pemohons.alamat',

@@ -76,4 +76,15 @@ export default class SkusController {
       return response.badRequest(error)
     }
   }
+
+  public async updateStatus({ params, request, response }: HttpContextContract) {
+    const sku = await Sku.find(params.id)
+    try {
+      sku.status = request.input('status')
+      await sku?.save()
+      return response.status(200)
+    } catch (err) {
+      return response.badRequest(err)
+    }
+  }
 }

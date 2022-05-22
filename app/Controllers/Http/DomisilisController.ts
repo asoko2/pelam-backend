@@ -64,6 +64,7 @@ export default class DomisilisController {
         'pemohons.nama',
         'pemohons.jenis_kelamin',
         'pemohons.tanggal_lahir',
+        'pemohons.pekerjaan',
         'pemohons.tempat_lahir',
         'pemohons.agama',
         'pemohons.kewarganegaraan',
@@ -97,6 +98,17 @@ export default class DomisilisController {
       return response.status(200)
     } catch (error) {
       return response.badRequest(error)
+    }
+  }
+
+  public async updateStatus({ params, request, response }: HttpContextContract) {
+    const domisili = await Domisili.find(params.id)
+    try {
+      domisili.status = request.input('status')
+      await domisili?.save()
+      return response.status(200)
+    } catch (err) {
+      return response.badRequest(err)
     }
   }
 }

@@ -69,4 +69,18 @@ export default class KehilanganKksController {
       return response.badRequest(error)
     }
   }
+
+  public async updateStatus({ params, request, response }: HttpContextContract) {
+    const kehilangan_kk = await KehilanganKk.find(params.id)
+    try {
+      console.log('start update')
+      kehilangan_kk.status = request.input('status')
+      await kehilangan_kk?.save()
+      return response.status(200)
+    } catch (err) {
+      console.log('gagal update')
+      console.log(err)
+      return response.badRequest(err)
+    }
+  }
 }
