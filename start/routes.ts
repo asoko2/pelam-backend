@@ -29,6 +29,7 @@ Route.post('/auth/register', 'UsersController.register')
 Route.post('/auth/login', 'UsersController.login')
 Route.post('/auth/logout', 'UsersController.logout')
 Route.get('/auth/user', 'UsersController.me')
+Route.get('/auth/check', 'UsersController.check')
 
 Route.get('/check', async () => {
   return 'berhasil'
@@ -38,6 +39,9 @@ Route.group(() => {
   Route.resource('pemohon', 'PemohonsController').except(['update', 'show', 'destroy']).apiOnly()
   Route.get('/pemohon/all', 'PemohonsController.getAll')
   Route.get('/pemohon/:nik', 'PemohonsController.show')
+  Route.get('/pemohon/byId/:id', 'PemohonsController.showById')
+  Route.get('/pemohon/getSurat/:nik', 'PemohonsController.getSurat')
+  Route.post('/pemohon/upload-kk/', 'PemohonsController.uploadKK')
   Route.put('/pemohon/:nik', 'PemohonsController.update')
   Route.delete('/pemohon/:nik', 'PemohonsController.destroy')
   Route.resource('sktm', 'SktmsController').except(['update']).apiOnly()

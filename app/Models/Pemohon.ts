@@ -12,6 +12,9 @@ export default class Pemohon extends BaseModel {
   public id: number
 
   @column()
+  public user_id: number
+
+  @column()
   public nama: string
 
   @column()

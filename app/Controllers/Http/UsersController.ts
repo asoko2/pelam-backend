@@ -1,5 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import Pemohon from 'App/Models/Pemohon'
 import User from 'App/Models/User'
 
 export default class UsersController {
@@ -13,10 +14,17 @@ export default class UsersController {
       level: schema.number(),
     })
 
+    const pemohonSchema = schema.create({
+      nik: schema.string({ trim: true }, [rules.unique({ table: 'pemohons', column: 'nik' })]),
+      nama: schema.string(),
+    })
+
     const data = await request.validate({ schema: userSchema })
+    const pemohonData = await request.validate({ schema: pemohonSchema })
 
     try {
       const user = await User.create(data)
+      await Pemohon.create(pemohonData)
 
       const token = await auth.login(user)
 
@@ -37,7 +45,6 @@ export default class UsersController {
         status: 'success',
         data: token,
       })
-      return token
     } catch (error) {
       response.status(400).json({
         status: 'error',
@@ -63,5 +70,10 @@ export default class UsersController {
         message: err,
       })
     }
+  }
+
+  public async check({ auth }) {
+    await auth.use('api').check()
+    return auth.use('api').isLoggedIn
   }
 }

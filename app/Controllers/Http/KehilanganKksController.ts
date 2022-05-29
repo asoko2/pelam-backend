@@ -1,6 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import KehilanganKk from 'App/Models/KehilanganKk'
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import { schema } from '@ioc:Adonis/Core/Validator'
 import Drive from '@ioc:Adonis/Core/Drive'
 import Env from '@ioc:Adonis/Core/Env'
 import Database from '@ioc:Adonis/Lucid/Database'
@@ -73,13 +73,10 @@ export default class KehilanganKksController {
   public async updateStatus({ params, request, response }: HttpContextContract) {
     const kehilangan_kk = await KehilanganKk.find(params.id)
     try {
-      console.log('start update')
       kehilangan_kk.status = request.input('status')
       await kehilangan_kk?.save()
       return response.status(200)
     } catch (err) {
-      console.log('gagal update')
-      console.log(err)
       return response.badRequest(err)
     }
   }
